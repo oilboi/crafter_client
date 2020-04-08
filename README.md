@@ -4,6 +4,7 @@
 <a href="https://github.com/oilboi/Crafter"> Here is the actual game </a>
 
 To install:
+
 1.) Download as zip
 
 2.) Unzip the folder to /minetest/clientmods/
