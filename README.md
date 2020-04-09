@@ -19,3 +19,8 @@ load_mod_crafter_client = true
 to the mods.conf file
 
 The Crafter game has clientside mods enabled by default so no further steps are needed
+
+
+Current features:
+
+1.) Weather effects
