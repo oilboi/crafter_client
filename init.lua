@@ -48,7 +48,7 @@ local run_discharge_timer = 0
 local old_up = false
 local sneak = false
 local old_sneak = false
-bunny_hop_timer = 0
+bunny_hop = false
 
 --attempt to tell the server to allow us to run
 local send_server_movement_state = function(state)
@@ -80,20 +80,16 @@ minetest.register_globalstep(function(dtime)
 		sneak = true
 	end
 	
-	--count down bunny hop state
-	if bunny_hop_timer > 0 then
-		bunny_hop_timer = bunny_hop_timer - dtime
-		if bunny_hop_timer <= 0 then
-			bunny_hop_timer = 0
-		end
+	--stop bunnyhopping on land
+	if bunny_hop == true and vel == 0 and oldvel < 0 then
+		bunny_hop = false
 	end
 	
 	--check if need to tell server to bunnyhop
-	if running == true and vel > 0 and bunny_hop_timer == 0 then
+	if running == true and vel > 0 and input.jump == true and bunny_hop == false then
 		send_server_movement_state("2")
-		bunny_hop_timer = 0.3
-	elseif bunny_hop_timer == 0 then
-		bunny_hopping = false
+		bunny_hop = true
+	elseif bunny_hop == false then
 		if running == true then
 			send_server_movement_state("1")
 			bunny_hop = false
