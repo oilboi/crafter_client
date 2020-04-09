@@ -80,18 +80,18 @@ minetest.register_globalstep(function(dtime)
 		sneak = true
 	end
 	
+	--count down bunny hop state
 	if bunny_hop_timer > 0 then
 		bunny_hop_timer = bunny_hop_timer - dtime
 		if bunny_hop_timer <= 0 then
 			bunny_hop_timer = 0
 		end
-		print(bunny_hop_timer)
 	end
 	
 	--check if need to tell server to bunnyhop
 	if running == true and vel > 0 and bunny_hop_timer == 0 then
 		send_server_movement_state("2")
-		bunny_hop_timer = 0.6
+		bunny_hop_timer = 0.3
 	elseif bunny_hop_timer == 0 then
 		bunny_hopping = false
 		if running == true then
