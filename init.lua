@@ -2,7 +2,7 @@
 local weather = minetest.mod_channel_join("weather_nodes")
 local weather_type = minetest.mod_channel_join("weather_type")
 local running_send = minetest.mod_channel_join("running_send")
-local running_receive = minetest.mod_channel_join("running_receive")
+local player_movement_state = minetest.mod_channel_join("player.player_movement_state")
 
 
 --we load everything seperately because it's easier to work on individual files than have everything jammed into one file
@@ -46,28 +46,74 @@ end
 local running = false
 local run_discharge_timer = 0
 local old_up = false
+local sneak = false
+local old_sneak = false
+bunny_hop_timer = 0
 
 --attempt to tell the server to allow us to run
-local send_server_run_state = function(state)
-	running_send:send_all(state)
+local send_server_movement_state = function(state)
+	player_movement_state:send_all(state)
 end
 
 --receive the server states
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == "running_receive" then
-		running = (message == "true")
+	if channel_name == "player.player_movement_state" then
+		running = message
 	end
 end)
 
 --check player's input on the "up" key
 minetest.register_globalstep(function(dtime)
 	local input = minetest.get_control_bits(minetest.localplayer)
+	local vel = minetest.localplayer:get_velocity().y
+	local oldvel = minetest.localplayer:get_last_velocity().y
 	
 	--reset the run flag
 	if running == true and (input.up == false or input.sneak == true or input.down == true) then
 		running = false
-		--print("running toggle off")
-		send_server_run_state("false")
+		bunny_hop = false
+		send_server_movement_state("0")
+	end
+	
+	--add this here so the player can sneak
+	if input.sneak == true then
+		sneak = true
+	end
+	
+	if bunny_hop_timer > 0 then
+		bunny_hop_timer = bunny_hop_timer - dtime
+		if bunny_hop_timer <= 0 then
+			bunny_hop_timer = 0
+		end
+		print(bunny_hop_timer)
+	end
+	
+	--check if need to tell server to bunnyhop
+	if running == true and vel > 0 and bunny_hop_timer == 0 then
+		send_server_movement_state("2")
+		bunny_hop_timer = 0.6
+	elseif bunny_hop_timer == 0 then
+		bunny_hopping = false
+		if running == true then
+			send_server_movement_state("1")
+			bunny_hop = false
+		elseif sneak == true then
+			send_server_movement_state("3")
+			bunny_hop = false
+		else
+			send_server_movement_state("0")
+		end
+	end
+	
+	
+	
+	
+	--set the sneak state
+	if sneak == true and old_sneak == false then
+		send_server_movement_state("3")
+	elseif input.sneak == false and old_sneak == true then
+		sneak = false
+		send_server_movement_state("0")
 	end
 	
 	--half second window to double tap running
@@ -81,7 +127,7 @@ minetest.register_globalstep(function(dtime)
 			run_discharge_timer = 0
 			running = true
 			--print("running toggle on")
-			send_server_run_state("true")
+			send_server_movement_state("1")
 		end
 	end
 	--check if new input of walking forwards
@@ -90,6 +136,7 @@ minetest.register_globalstep(function(dtime)
 	end
 	--save old value
 	old_up = input.up
+	old_sneak = input.sneak
 end)
 
 
