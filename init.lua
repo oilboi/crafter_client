@@ -128,7 +128,7 @@ minetest.register_globalstep(function(dtime)
 	end
 	--check if new input of walking forwards
 	if input.up and input.down == false and input.sneak == false and old_up == false and running == false and run_discharge_timer <= 0 then
-		run_discharge_timer = 0.5
+		run_discharge_timer = 0.2
 	end
 	--save old value
 	old_up = input.up
