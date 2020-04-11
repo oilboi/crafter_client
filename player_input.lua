@@ -36,7 +36,7 @@ local run_discharge_timer = 0
 local old_up = false
 local sneak = false
 local old_sneak = false
-bunny_hop = false
+local bunny_hop = false
 
 --attempt to tell the server to allow us to run
 local send_server_movement_state = function(state)
@@ -55,6 +55,7 @@ minetest.register_globalstep(function(dtime)
 	if not minetest.localplayer then
 		return
 	end
+	
 	local input = minetest.get_control_bits(minetest.localplayer)
 	local vel = minetest.localplayer:get_velocity().y
 	local oldvel = minetest.localplayer:get_last_velocity().y
