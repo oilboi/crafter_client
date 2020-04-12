@@ -10,31 +10,5 @@ player_movement_state = minetest.mod_channel_join("player.player_movement_state"
 local path = minetest.get_modpath("crafter_client")
 dofile(path.."/player_input.lua")
 dofile(path.."/weather_handling.lua")
+dofile(path.."/environment_effects.lua")
 
-local old_node
-local in_water = false
-local old_in_water = false
-minetest.register_globalstep(function(dtime)
-	if not minetest.localplayer then
-		return
-	end
-	
-	local vel = minetest.localplayer:get_velocity().y
-	local pos = minetest.localplayer:get_pos()
-	
-	local node = minetest.get_node_or_nil(pos)
-	if node then
-		local name = node.name
-		if name == "main:water" or name == "main:water_flowing" then
-			in_water = true
-			if in_water == true and old_in_water == false and vel < 0 then
-				minetest.sound_play("splash", {gain = 0.4, pitch = math.random(80,100)/100, gain = 0.05})
-			end
-		else
-			in_water = false
-		end
-	end
-	
-	old_node = node
-	old_in_water = in_water
-end)
