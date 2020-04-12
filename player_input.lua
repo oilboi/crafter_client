@@ -1,33 +1,3 @@
---0 is nothing
---1 is up
---2 is down
---4 is left
---8 is right
---16 is jump
---32 is auxilary
---64 is sneak
---128 is left click
---256 is right click
-
---make the data from get_key_pressed usable
---Thanks Thou shalt use my mods!
-function minetest.get_control_bits(player)
-	local input = player:get_key_pressed()
-	local input_table = {}
-	--iterate through the table using the highest value first
-	local keys = {"rightclick","leftclick","sneak","aux","jump","right","left","down","up"}
-	for index,data in pairs(keys) do
-		local modifier = math.pow(2, 9-index)
-		if input >= modifier then
-			input_table[data] = true
-			input = input - modifier
-		else
-			input_table[data] = false
-		end
-	end
-	return(input_table)
-end
-
 --double tap running
 
 --set up our initial values
@@ -61,21 +31,17 @@ minetest.register_globalstep(function(dtime)
 		return
 	end
 	
-	local input = minetest.get_control_bits(minetest.localplayer)
+	local input = minetest.localplayer:get_control()
 	local vel = minetest.localplayer:get_velocity()
-	--local oldvel = minetest.localplayer:get_last_velocity()
+	local oldvel = minetest.localplayer:get_last_velocity()
 	
 	--cancel running if the player bumps into something
-	--this doesn't work because the engine's collision detection is messed up
-	--[[
-	print(vel.x,oldvel.x)
 	if running == true and ((vel.x == 0 and oldvel.x ~= 0) or (vel.z == 0 and oldvel.z ~= 0)) then
 		running = false
 		bunny_hop = false
 		run_discharge_timer = 0
 		state = 0
 	end
-	]]--
 	
 	--reset the run flag
 	if running == true and (input.up == false or input.sneak == true or input.down == true) then
