@@ -71,7 +71,7 @@ minetest.register_globalstep(function(dtime)
 			run_discharge_timer = 0
 		end
 		--initialize double tap run
-		if old_up == false and input.up == true then
+		if old_up == false and input.up == true and vel.x ~= 0 and vel.z ~= 0 then
 			run_discharge_timer = 0
 			running = true
 			state = 1
