@@ -32,11 +32,8 @@ local spawn_snow = function(player)
 	for x,x_index in pairs(spawn_table) do
 		for z,y in pairs(x_index) do
 			if minetest.get_node_or_nil(vector.new(x,y+1,z)) ~= nil then
-				--print("got to this spointa")
 				local pos = vector.new(x,y+1,z)
-				local lightlevel = 14
-				--local lightlevel = minetest.get_node_light(pos, 0.5)
-				--print("but not here")
+				local lightlevel = minetest.get_node_light(pos, 0.5)
 				if lightlevel >= 14 then
 					minetest.add_particlespawner({
 						amount = 1,
@@ -90,11 +87,8 @@ local spawn_rain = function(player)
 	for x,x_index in pairs(spawn_table) do
 		for z,y in pairs(x_index) do
 			if minetest.get_node_or_nil(vector.new(x,y+1,z)) ~= nil then
-				--print("got to this spointa")
 				local pos = vector.new(x,y+1,z)
-				local lightlevel = 14
-				--local lightlevel = minetest.get_node_light(pos, 0.5)
-				--print("but not here")
+				local lightlevel = minetest.get_node_light(pos, 0.5)
 				if lightlevel >= 14 then
 					minetest.add_particlespawner({
 						amount = 1,
