@@ -51,7 +51,7 @@ minetest.register_globalstep(function(dtime)
 	
 	--the water trickling timer
 	water_trickling_timer = water_trickling_timer + dtime
-	if water_trickling_timer > 1 then
+	if water_trickling_timer > 0.4 then
 		water_trickling_timer = 0
 		local is_water_near = minetest.find_node_near(pos, 3, {"main:waterflow"})
 		if is_water_near and not water_sound_handle then
