@@ -57,8 +57,8 @@ minetest.register_globalstep(function(dtime)
 		water_trickling_timer = 0
 		local is_water_near = minetest.find_node_near(pos, 3, {"main:waterflow"})
 		if is_water_near and not water_sound_handle then
-			minetest.sound_fade(water_sound_handle, 0.25, 0.1)
 			water_sound_handle = minetest.sound_play("stream", {loop=true,gain=0})
+			minetest.sound_fade(water_sound_handle, 0.25, 0.1)
 		elseif not is_water_near and water_sound_handle then
 			minetest.sound_fade(water_sound_handle, -0.25, 0)
 			water_sound_handle = nil
