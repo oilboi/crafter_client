@@ -6,7 +6,7 @@ running_send = minetest.mod_channel_join("running_send")
 player_movement_state = minetest.mod_channel_join("player.player_movement_state")
 
 
-local function initialize_all()
+function initialize_all()
 	--first we tell the server we're ready
 	weather_intake:send_all("READY")
 	weather_intake:leave()
@@ -25,7 +25,11 @@ end
 local initialize = false
 minetest.register_globalstep(function(dtime)
 	if not initialize and minetest.camera and not vector.equals(minetest.camera:get_pos(),vector.new(0,0,0)) then
-		initialize = true
-		initialize_all()
+		minetest.after(2, function()
+			if weather_intake then
+				initialize = true
+				initialize_all()
+			end
+		end)
 	end
 end)
