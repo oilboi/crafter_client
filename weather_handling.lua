@@ -5,6 +5,8 @@ local rain = false
 local weather_update_timer = 0
 local id_table = {}
 
+local rain_sound_handle = nil
+
 local spawn_snow = function(player)
 	local pos = player:get_pos()
 	local radius = 10
@@ -91,12 +93,12 @@ local spawn_rain = function(player)
 				local lightlevel = minetest.get_node_light(pos, 0.5)
 				if lightlevel >= 14 then
 					minetest.add_particlespawner({
-						amount = 1,
+						amount = 3,
 						time = 0.5,
 						minpos = vector.new(x-0.5,y,z-0.5),
 						maxpos = vector.new(x+0.5,y+20,z+0.5),
-						minvel = {x=0, y=-9.81, z=0},
-						maxvel = {x=0, y=-9.81, z=0},
+						minvel = {x=0, y=-20, z=0},
+						maxvel = {x=0, y=-20, z=0},
 						minacc = {x=0, y=0, z=0},
 						maxacc = {x=0, y=0, z=0},
 						minexptime = 1,
@@ -151,5 +153,12 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 			rain = false
 			snow = false
 		end
+	end
+	if not rain_sound_handle and rain == true then
+		rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
+		minetest.sound_fade(rain_sound_handle, 0.5, 0.5)
+	elseif rain_sound_handle and rain == false then
+		minetest.sound_fade(rain_sound_handle, -0.5, 0)
+		rain_sound_handle = nil
 	end
 end)
