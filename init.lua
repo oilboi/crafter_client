@@ -24,7 +24,7 @@ end
 --since there does not seem to be any client_loaded function
 local initialize = false
 minetest.register_globalstep(function(dtime)
-	if not initialize and not vector.equals(minetest.camera:get_pos(),vector.new(0,0,0)) then
+	if not initialize and minetest.camera and not vector.equals(minetest.camera:get_pos(),vector.new(0,0,0)) then
 		initialize = true
 		initialize_all()
 	end
