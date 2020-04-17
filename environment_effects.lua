@@ -42,9 +42,7 @@ minetest.register_globalstep(function(dtime)
 	if scary_sound_player_timer > 300 then
 		scary_sound_player_timer = math.random(-120,0)
 		pos.y = pos.y + 1.625
-		--save this for version 5.3.0
-		--local light = minetest.get_node_light(pos)
-		local light = 15
+		local light = minetest.get_node_light(pos)
 		if pos.y < 0 and light <= 13 then
 			minetest.sound_play("scary_noise",{gain=0.4,pitch=math.random(70,100)/100})
 		end	
@@ -59,14 +57,10 @@ minetest.register_globalstep(function(dtime)
 		water_trickling_timer = 0
 		local is_water_near = minetest.find_node_near(pos, 3, {"main:waterflow"})
 		if is_water_near and not water_sound_handle then
-			water_sound_handle = minetest.sound_play("stream", {loop=true,gain=0.1})
-			--save this for version 5.3.0
-			--minetest.sound_fade(water_sound_handle, 0.25, 0.1)
-			--water_sound_handle = minetest.sound_play("stream", {loop=true,gain=0})
+			minetest.sound_fade(water_sound_handle, 0.25, 0.1)
+			water_sound_handle = minetest.sound_play("stream", {loop=true,gain=0})
 		elseif not is_water_near and water_sound_handle then
-			--save this for version 5.3.0
-			--minetest.sound_fade(water_sound_handle, -0.25, 0)
-			minetest.sound_stop(water_sound_handle)
+			minetest.sound_fade(water_sound_handle, -0.25, 0)
 			water_sound_handle = nil
 		end
 	end
