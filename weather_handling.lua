@@ -118,6 +118,7 @@ local spawn_rain = function(player)
 	end
 end
 
+--client runs through spawning weather particles
 minetest.register_globalstep(function(dtime)
 	if do_effects then
 		if snow or rain then
@@ -138,10 +139,14 @@ end)
 
 
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
+	--receive the initial packet which tells the client which nodes
+	--to spawn weather columns on
 	if channel_name == "weather_nodes" then
 		all_nodes = minetest.deserialize(message)
 		do_effects = true
+		weather:leave() --leave the channel
 	end
+	--receive the weather type
 	if channel_name == "weather_type" then
 		if message == "1" then
 			rain = false
@@ -154,6 +159,7 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 			snow = false
 		end
 	end
+	--rain sound effect
 	if not rain_sound_handle and rain == true then
 		rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
 		minetest.sound_fade(rain_sound_handle, 0.5, 0.5)
