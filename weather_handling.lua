@@ -188,7 +188,6 @@ minetest.register_globalstep(function(dtime)
 					end
 				--rain blood upwards in the nether
 				else
-					print("ichor")
 					if snow == true or rain == true then
 						spawn_ichor(minetest.localplayer)
 					end
