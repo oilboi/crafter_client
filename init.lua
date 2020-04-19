@@ -5,6 +5,8 @@ weather_type = minetest.mod_channel_join("weather_type")
 running_send = minetest.mod_channel_join("running_send")
 player_movement_state = minetest.mod_channel_join("player.player_movement_state")
 
+nether = minetest.mod_channel_join("nether_teleporters")
+
 
 function initialize_all()
 	--first we tell the server we're ready
@@ -18,6 +20,7 @@ function initialize_all()
 	dofile(path.."/player_input.lua")
 	dofile(path.."/weather_handling.lua")
 	dofile(path.."/environment_effects.lua")
+	dofile(path.."/nether.lua")
 end
 
 --we must delay initialization until the player's camera exists in the world
