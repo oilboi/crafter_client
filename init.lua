@@ -24,18 +24,13 @@ function initialize_all()
 	dofile(path.."/nether.lua")
 end
 
---we must delay initialization until the server tells us it's ready to begin
+--we must delay initialization until the player exists in the world
 local function recursive_startup_attempt()
-	local initialize_client_modchannels = minetest.mod_channel_join("initializer")
-	
-	local ready_to_go = initialize_client_modchannels:is_writeable()
-	if ready_to_go == true then
+	local ready_to_go = minetest.localplayer
+	if ready_to_go then
 		--good to begin
 		initialize_all()
-		initialize_client_modchannels:leave()
 	else
-	
-		
 		--try again
 		minetest.after(0,function()
 			recursive_startup_attempt()
