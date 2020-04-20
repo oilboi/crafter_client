@@ -235,3 +235,11 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 		rain_sound_handle = nil
 	end
 end)
+
+
+--We must tell the server that we're ready
+minetest.after(0,function()
+	weather_intake:send_all("READY")
+	weather_intake:leave()
+	weather_intake = nil --leave the channel
+end)
