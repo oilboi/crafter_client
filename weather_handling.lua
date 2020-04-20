@@ -172,36 +172,36 @@ end
 
 --client runs through spawning weather particles
 local player_pos
-minetest.register_globalstep(function(dtime)
+local function update_weather()
 	player_pos = minetest.localplayer:get_pos()
 	if do_effects then
 		if snow or rain then
-			weather_update_timer = weather_update_timer + dtime
-			if weather_update_timer >= 0.5 then
-				weather_update_timer = 0
-				--do normal weather
-				if player_pos.y > -10033 then
-					if snow == true then
-						spawn_snow(minetest.localplayer)
-					elseif rain == true then
-						spawn_rain(minetest.localplayer)
-					end
-				--rain blood upwards in the nether
-				else
-					if snow == true or rain == true then
-						spawn_ichor(minetest.localplayer)
-					end
-				
-					--stop the rain sound effect
-					if rain_sound_handle then
-						minetest.sound_fade(rain_sound_handle, -0.5, 0)
-						rain_sound_handle = nil
-					end
+			--do normal weather
+			if player_pos.y > -10033 then
+				if snow == true then
+					spawn_snow(minetest.localplayer)
+				elseif rain == true then
+					spawn_rain(minetest.localplayer)
+				end
+			--rain blood upwards in the nether
+			else
+				if snow == true or rain == true then
+					spawn_ichor(minetest.localplayer)
+				end
+			
+				--stop the rain sound effect
+				if rain_sound_handle then
+					minetest.sound_fade(rain_sound_handle, -0.5, 0)
+					rain_sound_handle = nil
 				end
 			end
 		end
 	end
-end)
+	--do again every half second
+	minetest.after(0.5, function()
+		update_weather()
+	end)
+end
 
 
 
@@ -242,4 +242,7 @@ minetest.after(0,function()
 	weather_intake:send_all("READY")
 	weather_intake:leave()
 	weather_intake = nil --leave the channel
+	
+	--begin weather update
+	update_weather()
 end)
