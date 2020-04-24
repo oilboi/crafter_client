@@ -14,6 +14,7 @@ function initialize_all()
 	running_send = minetest.mod_channel_join("running_send")
 	player_movement_state = minetest.mod_channel_join("player.player_movement_state")
 	nether = minetest.mod_channel_join("nether_teleporters")
+	aether = minetest.mod_channel_join("aether_teleporters")
 		
 	--next we load everything seperately because it's easier to work on individual files than have everything jammed into one file
 	--not into seperate mods because that is unnecessary and cumbersome
@@ -22,6 +23,7 @@ function initialize_all()
 	dofile(path.."/weather_handling.lua")
 	dofile(path.."/environment_effects.lua")
 	dofile(path.."/nether.lua")
+	dofile(path.."/aether.lua")
 end
 
 --we must delay initialization until the player exists in the world
