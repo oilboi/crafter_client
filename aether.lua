@@ -40,7 +40,6 @@ minetest.register_globalstep(function(dtime)
 		elseif opacity < 255 then
 			--make the hud fade in
 			opacity = opacity + (dtime*100)
-			print(opacity)
 			
 			minetest.localplayer:hud_change(hud_bg_id, "text", "aether_portal_gui.png^[opacity:"..opacity)
 		end
