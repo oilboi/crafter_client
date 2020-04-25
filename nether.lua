@@ -1,10 +1,7 @@
 --nether teleporters are animation based
 --the animation must finish before the teleport is initialized
-
-local hud_id = nil --foreground (portal)
-local hud_bg_id = nil --black background
-local nether_id = nil --the nether incoming
-local cool_off_timer = 0 --use this to stop players teleporting back and forth
+local hud_bg_id = nil --aether portal bg
+local aether_cool_off_timer = 0 --use this to stop players teleporting back and forth
 local init_sound = nil
 local teleport_sound = nil
 local opacity = 0
@@ -14,10 +11,10 @@ minetest.register_globalstep(function(dtime)
 		return
 	end
 	--use this for player cooloff timer also to not overload server
-	if cool_off_timer > 0 then
-		cool_off_timer = cool_off_timer - dtime
-		if cool_off_timer <= 0 then
-			cool_off_timer = 0
+	if aether_cool_off_timer > 0 then
+		aether_cool_off_timer = aether_cool_off_timer - dtime
+		if aether_cool_off_timer <= 0 then
+			aether_cool_off_timer = 0
 		end
 	end
 	
@@ -26,9 +23,9 @@ minetest.register_globalstep(function(dtime)
 	
 	local node = minetest.get_node_or_nil(pos)
 	
-	if node and node.name == "nether:portal" and cool_off_timer == 0 then
+	if node and node.name == "nether:portal" and aether_cool_off_timer == 0 then
 		if init_sound == nil then
-			init_sound = minetest.sound_play("portal_initialize",{gain=0,pitch=math.random(70,90)/100})
+			init_sound = minetest.sound_play("portal_initialize",{gain=0})
 			minetest.sound_fade(init_sound, 0.34, 1)
 		end
 		if hud_bg_id == nil then
@@ -37,123 +34,62 @@ minetest.register_globalstep(function(dtime)
 				position = {x=0.5, y=0.5},
 				name = "",    -- default ""
 				scale = {x=-100, y=-100}, -- default {x=0,y=0}
-				text = "darkness.png^[opacity:"..opacity,    -- default ""
-			})
-			hud_id = minetest.localplayer:hud_add({
-				hud_elem_type = "image", -- see HUD element types, default "text"
-				position = {x=0.5, y=0.5},
-				name = "",    -- default ""
-				scale = {x=-1, y=-1}, -- default {x=0,y=0}
 				text = "nether_portal_gui.png^[opacity:"..opacity,    -- default ""
 			})
-			nether_id = minetest.localplayer:hud_add({
-				hud_elem_type = "image", -- see HUD element types, default "text"
-				position = {x=0.5, y=0.5},
-				name = "",    -- default ""
-				scale = {x=0, y=0}, -- default {x=0,y=0}
-				text = "darkness.png^[opacity:"..opacity,    -- default ""
-			})
-		else
-			--make the hud zoom in
-			local scale = minetest.localplayer:hud_get(hud_id).scale.x
-			if scale > -100 then
-				scale = scale - ((scale/-(1/dtime))*2)
-			elseif scale < -100 then	
-				scale = -100
-			end
-			opacity = -scale * 2.55
-			minetest.localplayer:hud_change(hud_id, "scale", {x=scale,y=scale})
-			minetest.localplayer:hud_change(hud_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
 			
-			minetest.localplayer:hud_change(hud_bg_id, "text", "darkness.png^[opacity:"..opacity)
+		elseif opacity < 255 then
+			--make the hud fade in
+			opacity = opacity + (dtime*100)
 			
-			minetest.localplayer:hud_change(nether_id, "text", "darkness.png^[opacity:"..opacity)
+			minetest.localplayer:hud_change(hud_bg_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
 		end
-	elseif hud_bg_id and hud_id then
-		--play spooky sounds
+	elseif hud_bg_id then
+		--play heavenly sounds
+		
 		if init_sound then
-			minetest.sound_fade(init_sound, -0.25, 0)
+			minetest.sound_fade(init_sound, -0.4, 0)
 			init_sound = nil
-			teleport_sound = minetest.sound_play("portal_teleported",{gain=1,pitch=math.random(70,90)/100})
+			teleport_sound = minetest.sound_play("portal_teleported",{gain=1})
 			minetest.sound_fade(teleport_sound, -0.1, 0)
 			teleport_sound = nil
 		end
+		
 		--player left portal before teleporting
-		if cool_off_timer == 0 then
-			--make the hud zoom out
-			local scale = minetest.localplayer:hud_get(hud_id).scale.x
-			if scale < -1 then
-				scale = scale + ((scale/-(1/dtime))*2)
-			elseif scale > -1 then	
-				scale = -1
-			end
-			opacity = -scale * 2.55
-			minetest.localplayer:hud_change(hud_id, "scale", {x=scale,y=scale})
+		if aether_cool_off_timer == 0 then
+			opacity = opacity  - (dtime*100)			
+			minetest.localplayer:hud_change(hud_bg_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
 			
-			minetest.localplayer:hud_change(hud_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
-			
-			minetest.localplayer:hud_change(hud_bg_id, "text", "darkness.png^[opacity:"..opacity)
-			
-			minetest.localplayer:hud_change(nether_id, "text", "darkness.png^[opacity:"..opacity)
-			
-			if scale == -1 then
+			if opacity <= 0 then
 				minetest.localplayer:hud_remove(hud_bg_id)
-				minetest.localplayer:hud_remove(hud_id)
-				minetest.localplayer:hud_remove(nether_id)
-				nether_id = nil
 				hud_bg_id = nil
-				hud_id = nil
 				opacity = 0
 			end
 		--teleport complete animation
-		elseif cool_off_timer > 0 then
-			local scale = minetest.localplayer:hud_get(nether_id).scale.x
-			if scale == 0 then scale = -1 end
-			if scale > -100 then
-				scale = scale - ((scale/-(1/dtime))*2)
-			elseif scale < -100 then	
-				scale = -100
-			end
+		elseif aether_cool_off_timer > 0 then
+		
+			opacity = opacity  - (dtime*100)			
+			minetest.localplayer:hud_change(hud_bg_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
 			
-			opacity = (100+scale) * 2.55
-			minetest.localplayer:hud_change(nether_id, "scale", {x=scale,y=scale})
-			
-			
-			minetest.localplayer:hud_change(hud_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
-			
-			minetest.localplayer:hud_change(hud_bg_id, "text", "darkness.png^[opacity:"..opacity)
-			
-			minetest.localplayer:hud_change(nether_id, "text", "darkness.png^[opacity:"..opacity)
-			
-			
-			if scale == -100 then
+			if opacity <= 0 then
 				minetest.localplayer:hud_remove(hud_bg_id)
-				minetest.localplayer:hud_remove(hud_id)
-				minetest.localplayer:hud_remove(nether_id)
-				nether_id = nil
 				hud_bg_id = nil
-				hud_id = nil
 				opacity = 0
 			end
 		else
 			init_sound = nil
 		end
-	elseif hud_bg_id and hud_id then
+	elseif hud_bg_id then
 		minetest.localplayer:hud_remove(hud_bg_id)
-		minetest.localplayer:hud_remove(hud_id)
-		minetest.localplayer:hud_remove(nether_id)
-		nether_id = nil
 		hud_bg_id = nil
-		hud_id = nil
+		opacity = 0
 	end
 	
 	--initialize teleport command to server
-	if hud_bg_id and hud_id and cool_off_timer == 0 then
-		local scale = minetest.localplayer:hud_get(hud_id).scale.x
-		if scale == -100 then
+	if hud_bg_id and aether_cool_off_timer == 0 then
+		if opacity >= 255 then
 			nether:send_all("teleport me")
-			--can't use any portal for 6 seconds
-			cool_off_timer = 6
+			--can't use any portal for 7 seconds
+			aether_cool_off_timer = 6  --if you read this, you'll notice the nether cool off timer is 6 and this is 7 ;)
 		end
 	end
 end)
