@@ -39,9 +39,10 @@ minetest.register_globalstep(function(dtime)
 			
 		elseif opacity < 255 then
 			--make the hud fade in
-			opacity = opacity + 1.5
+			opacity = opacity + (dtime*100)
+			print(opacity)
 			
-			minetest.localplayer:hud_change(hud_bg_id, "text", "aether_portal_gui.png^[opacity:"..opacity)			
+			minetest.localplayer:hud_change(hud_bg_id, "text", "aether_portal_gui.png^[opacity:"..opacity)
 		end
 	elseif hud_bg_id then
 		--play heavenly sounds
@@ -56,7 +57,7 @@ minetest.register_globalstep(function(dtime)
 		
 		--player left portal before teleporting
 		if aether_cool_off_timer == 0 then
-			opacity = opacity  - 1.5			
+			opacity = opacity  - (dtime*100)			
 			minetest.localplayer:hud_change(hud_bg_id, "text", "aether_portal_gui.png^[opacity:"..opacity)
 			
 			if opacity <= 0 then
@@ -67,7 +68,7 @@ minetest.register_globalstep(function(dtime)
 		--teleport complete animation
 		elseif aether_cool_off_timer > 0 then
 		
-			opacity = opacity  - 1.5			
+			opacity = opacity  - (dtime*100)			
 			minetest.localplayer:hud_change(hud_bg_id, "text", "aether_portal_gui.png^[opacity:"..opacity)
 			
 			if opacity <= 0 then
@@ -86,7 +87,7 @@ minetest.register_globalstep(function(dtime)
 	
 	--initialize teleport command to server
 	if hud_bg_id and aether_cool_off_timer == 0 then
-		if opacity == 255 then
+		if opacity >= 255 then
 			aether:send_all("teleport me")
 			--can't use any portal for 7 seconds
 			aether_cool_off_timer = 7  --if you read this, you'll notice the nether cool off timer is 6 and this is 7 ;)
