@@ -46,7 +46,7 @@ minetest.register_globalstep(function(dtime)
 	elseif hud_bg_id then
 		--play heavenly sounds
 		
-		if init_sound then
+		if init_sound and node and node.name == "nether:portal" then
 			minetest.sound_fade(init_sound, -0.4, 0)
 			init_sound = nil
 			teleport_sound = minetest.sound_play("portal_teleported",{gain=1})
@@ -58,6 +58,11 @@ minetest.register_globalstep(function(dtime)
 		if aether_cool_off_timer == 0 then
 			opacity = opacity  - (dtime*100)			
 			minetest.localplayer:hud_change(hud_bg_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
+			
+			if init_sound then
+				minetest.sound_fade(init_sound, -0.4, 0)
+				init_sound = nil
+			end
 			
 			if opacity <= 0 then
 				minetest.localplayer:hud_remove(hud_bg_id)
