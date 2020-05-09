@@ -155,13 +155,13 @@ local spawn_rain = function(player)
 						maxacc = {x=0, y=0, z=0},
 						minexptime = 1,
 						maxexptime = 2,
-						minsize = 1,
-						maxsize = 1,
+						minsize = 4,
+						maxsize = 4,
 						collisiondetection = true,
 						collision_removal = true,
 						object_collision = false,
 						vertical = true,
-						texture = "raindrop.png",
+						texture = "raindrop.png^[opacity:80",
 						playername = player:get_name(),
 					})
 				end
