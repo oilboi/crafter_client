@@ -33,7 +33,25 @@ local hud_node = minetest.localplayer:hud_add({
 	})
 
 
+local waih_name = minetest.localplayer:hud_add({
+	name = "hud_name",
+	position = {x=0.5,y=1},
+	hud_elem_type = "text",
+	number = 0xFFFFFF,
+	alignment = 0,
+	offset = { x = 0, y = -150},
+	text = "",
+	z_index = 1,
+})
+
+
+local pos_min = 10
+local pos_max = -150
+local waih_timer = 0
+local old_item = ""
+
 local function update()
+	--waila
 	if minetest.camera then
 		local pos = minetest.camera:get_pos()
 		local pos2 = vector.add(pos,vector.multiply(minetest.camera:get_look_dir(), 4))
@@ -57,6 +75,25 @@ local function update()
 			hud_item_name = ""
 		end
 	end
+
+	
+	--waih
+	local item = minetest.localplayer:get_wielded_item():get_name()
+	if waih_timer > 0 then
+		waih_timer = waih_timer - 0.01
+		if waih_timer <= 0 then
+			waih_timer = 0
+			minetest.localplayer:hud_change(waih_name, "text", "")
+		end
+	end
+	if item ~= old_item then
+		waih_timer = 1
+		local description = minetest.get_item_def(item).description
+		minetest.localplayer:hud_change(waih_name, "text", description)
+	end
+	old_item = item
+
+
 	minetest.after(0.01, function()
 		update()
 	end)
