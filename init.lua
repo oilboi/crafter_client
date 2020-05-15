@@ -5,7 +5,7 @@ weather_type = nil
 running_send = nil
 player_movement_state = nil
 nether = nil
-
+aether = nil
 function initialize_all()
 	--declare globals for now
 	weather_intake = minetest.mod_channel_join("weather_intake")
