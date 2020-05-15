@@ -24,6 +24,7 @@ function initialize_all()
 	dofile(path.."/environment_effects.lua")
 	dofile(path.."/nether.lua")
 	dofile(path.."/aether.lua")
+	dofile(path.."/waila.lua")
 end
 
 --we must delay initialization until the player exists in the world
