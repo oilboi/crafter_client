@@ -88,8 +88,8 @@ local function update()
 	end
 	if item ~= old_item then
 		waih_timer = 1
-		local description = minetest.get_item_def(item).description
-		minetest.localplayer:hud_change(waih_name, "text", description)
+		--print(dump(minetest.get_item_def(item)))
+		minetest.localplayer:hud_change(waih_name, "text", item)
 	end
 	old_item = item
 
