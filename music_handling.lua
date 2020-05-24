@@ -16,14 +16,14 @@ minetest.register_globalstep(function(dtime)
     --print(time_of_day)
     if song_table[time_of_day] and not song_playing then
         song_playing = song_table[time_of_day].name
-        print("playing "..song_table[time_of_day].name)
+        --print("playing "..song_table[time_of_day].name)
         minetest.sound_play(song_table[time_of_day].name,{gain=0.3})
         song_index = time_of_day
     elseif song_playing then
         song_tick = song_tick + dtime
-        print(song_tick)
+        --print(song_tick)
         if song_tick > song_table[song_index].length then
-            print("resetting the song variable")
+            --print("resetting the song variable")
             song_playing = nil
             song_index = nil
             song_tick = 0
