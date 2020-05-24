@@ -33,7 +33,7 @@ end
 --we must delay initialization until the player exists in the world
 local function recursive_startup_attempt()
 	local ready_to_go = minetest.localplayer
-	if ready_to_go then
+	if ready_to_go and minetest.get_node_or_nil(minetest.localplayer:get_pos()) then
 		--good to begin
 		initialize_all()
 	else
