@@ -1,7 +1,7 @@
 --nether teleporters are animation based
 --the animation must finish before the teleport is initialized
 local hud_bg_id = nil --aether portal bg
-local aether_cool_off_timer = 0 --use this to stop players teleporting back and forth
+local nether_cool_off_timer = 0 --use this to stop players teleporting back and forth
 local init_sound = nil
 local teleport_sound = nil
 local opacity = 0
@@ -11,10 +11,10 @@ minetest.register_globalstep(function(dtime)
 		return
 	end
 	--use this for player cooloff timer also to not overload server
-	if aether_cool_off_timer > 0 then
-		aether_cool_off_timer = aether_cool_off_timer - dtime
-		if aether_cool_off_timer <= 0 then
-			aether_cool_off_timer = 0
+	if nether_cool_off_timer > 0 then
+		nether_cool_off_timer = nether_cool_off_timer - dtime
+		if nether_cool_off_timer <= 0 then
+			nether_cool_off_timer = 0
 		end
 	end
 	
@@ -23,7 +23,7 @@ minetest.register_globalstep(function(dtime)
 	
 	local node = minetest.get_node_or_nil(pos)
 	
-	if node and node.name == "nether:portal" and aether_cool_off_timer == 0 then
+	if node and node.name == "nether:portal" and nether_cool_off_timer == 0 then
 		if init_sound == nil then
 			init_sound = minetest.sound_play("portal_initialize",{gain=0})
 			minetest.sound_fade(init_sound, 0.34, 1)
@@ -55,7 +55,7 @@ minetest.register_globalstep(function(dtime)
 		end
 		
 		--player left portal before teleporting
-		if aether_cool_off_timer == 0 then
+		if nether_cool_off_timer == 0 then
 			opacity = opacity  - (dtime*100)			
 			minetest.localplayer:hud_change(hud_bg_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
 			
@@ -70,7 +70,7 @@ minetest.register_globalstep(function(dtime)
 				opacity = 0
 			end
 		--teleport complete animation
-		elseif aether_cool_off_timer > 0 then
+		elseif nether_cool_off_timer > 0 then
 		
 			opacity = opacity  - (dtime*100)			
 			minetest.localplayer:hud_change(hud_bg_id, "text", "nether_portal_gui.png^[opacity:"..opacity)
@@ -90,11 +90,40 @@ minetest.register_globalstep(function(dtime)
 	end
 	
 	--initialize teleport command to server
-	if hud_bg_id and aether_cool_off_timer == 0 then
+	if hud_bg_id and nether_cool_off_timer == 0 then
 		if opacity >= 255 then
 			nether:send_all("teleport me")
 			--can't use any portal for 7 seconds
-			aether_cool_off_timer = 6  --if you read this, you'll notice the nether cool off timer is 6 and this is 7 ;)
+			nether_cool_off_timer = 6  --if you read this, you'll notice the nether cool off timer is 6 and this is 7 ;)
+			minetest.after(1,function()
+				local after_newpos = minetest.localplayer:get_pos().y
+				if after_newpos < -10000 and after_newpos > -20000 then
+					--cancel old songs
+					if current_song then
+						minetest.sound_fade(current_song,-0.4,0)
+					end
+
+					minetest.after(math.random(3,5)+math.random(),function()
+						if after_newpos < -10000 and after_newpos > -20000 then
+							--backup in case server lags out
+							if current_song then
+								minetest.sound_fade(current_song,-0.4,0)
+							end
+							local song = 90000+math.random(0,1)
+							--print(song)
+							song_playing = song_table[song].name
+							current_song = minetest.sound_play(song_table[song].name,{gain=song_volume})
+							song_index = song
+							
+						end
+					end)
+				elseif song_playing and (song_index == 90000 or song_index == 90001) then
+					minetest.sound_fade(current_song,-0.4,0)
+					song_playing = nil
+					song_index = nil
+					song_tick = 0
+				end
+			end)
 		end
 	end
 end)
