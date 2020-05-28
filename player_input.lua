@@ -21,7 +21,7 @@ end
 
 --receive the server states
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == "player.player_movement_state" then
+	if channel_name == name..":receive_player_movement_state" then
 		running = message
 	end
 end)

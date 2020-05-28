@@ -7,14 +7,14 @@ player_movement_state = nil
 nether = nil
 aether = nil
 run = nil
-
+name = nil
 function initialize_all()
 	--declare globals for now
 	weather_intake = minetest.mod_channel_join("weather_intake")
 	weather = minetest.mod_channel_join("weather_nodes")
 	weather_type = minetest.mod_channel_join("weather_type")
 	running_send = minetest.mod_channel_join("running_send")
-	player_movement_state = minetest.mod_channel_join("player.player_movement_state")
+	player_movement_state = minetest.mod_channel_join(name..":player_movement_state")
 	nether = minetest.mod_channel_join("nether_teleporters")
 	aether = minetest.mod_channel_join("aether_teleporters")
 		
@@ -34,6 +34,7 @@ end
 local function recursive_startup_attempt()
 	local ready_to_go = minetest.localplayer
 	if ready_to_go and minetest.get_node_or_nil(minetest.localplayer:get_pos()) then
+		name = minetest.localplayer:get_name()
 		--good to begin
 		initialize_all()
 	else
