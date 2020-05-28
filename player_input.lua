@@ -20,11 +20,11 @@ local send_server_movement_state = function(state)
 end
 
 --receive the server states
-minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == name..":receive_player_movement_state" then
-		running = message
-	end
-end)
+--minetest.register_on_modchannel_message(function(channel_name, sender, message)
+--	if channel_name == name..":receive_player_movement_state" then
+--		running = message
+--	end
+--end)
 
 --check player's input on the "up" key
 minetest.register_globalstep(function(dtime)
