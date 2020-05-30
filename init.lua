@@ -6,6 +6,7 @@ player_movement_state = nil
 nether = nil
 aether = nil
 name = nil
+version_channel = nil
 
 function initialize_all()
 	--declare globals for now
@@ -15,6 +16,7 @@ function initialize_all()
 	player_movement_state = minetest.mod_channel_join(name..":player_movement_state")
 	nether = minetest.mod_channel_join(name..":nether_teleporters")
 	aether = minetest.mod_channel_join(name..":aether_teleporters")
+	version_channel = minetest.mod_channel_join(name..":client_version_channel")
 		
 	--next we load everything seperately because it's easier to work on individual files than have everything jammed into one file
 	--not into seperate mods because that is unnecessary and cumbersome
@@ -26,6 +28,7 @@ function initialize_all()
 	dofile(path.."/aether.lua")
 	dofile(path.."/waila.lua")
 	dofile(path.."/music_handling.lua")
+	dofile(path.."/version_send.lua")
 end
 
 --we must delay initialization until the player exists in the world
