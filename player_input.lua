@@ -91,7 +91,7 @@ minetest.register_globalstep(function(dtime)
 		run_discharge_timer = 0
 		sneak = true
 		bunny_hop = false
-		run = false
+		running = false
 	end
 	
 
