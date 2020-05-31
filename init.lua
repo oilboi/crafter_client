@@ -29,6 +29,7 @@ function initialize_all()
 	dofile(path.."/waila.lua")
 	dofile(path.."/music_handling.lua")
 	dofile(path.."/version_send.lua")
+	dofile(path.."/colored_names/colored_names.lua")
 end
 
 --we must delay initialization until the player exists in the world
