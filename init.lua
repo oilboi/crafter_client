@@ -7,6 +7,7 @@ nether = nil
 aether = nil
 name = nil
 version_channel = nil
+fire_handling_channel = nil
 
 function initialize_all()
 	--declare globals for now
@@ -17,7 +18,8 @@ function initialize_all()
 	nether = minetest.mod_channel_join(name..":nether_teleporters")
 	aether = minetest.mod_channel_join(name..":aether_teleporters")
 	version_channel = minetest.mod_channel_join(name..":client_version_channel")
-		
+	fire_handling_channel = minetest.mod_channel_join(name..":fire_state")
+
 	--next we load everything seperately because it's easier to work on individual files than have everything jammed into one file
 	--not into seperate mods because that is unnecessary and cumbersome
 	local path = minetest.get_modpath("crafter_client")
@@ -30,6 +32,7 @@ function initialize_all()
 	dofile(path.."/music_handling.lua")
 	dofile(path.."/version_send.lua")
 	dofile(path.."/colored_names/colored_names.lua")
+	dofile(path.."/fire_handling.lua")
 end
 
 --we must delay initialization until the player exists in the world
