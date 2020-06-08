@@ -159,18 +159,16 @@ local function update_weather()
 	end)
 end
 
-
-
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	--receive the initial packet which tells the client which nodes
 	--to spawn weather columns on
-	if channel_name == "weather_nodes" then
+	if sender == "" and channel_name == "weather_nodes" then
 		all_nodes = minetest.deserialize(message)
 		do_effects = true
 		weather:leave() --leave the channel
 	end
 	--receive the weather type
-	if channel_name == "weather_type" then
+	if sender == "" and channel_name == "weather_type" then
 		if message == "1" then
 			rain = false
 			snow = true

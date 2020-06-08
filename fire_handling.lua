@@ -4,7 +4,7 @@ local fire_animation_timer = 0
 local fire_animation_tile = 0
 --receive the server states
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == name..":fire_state" then
+	if sender == "" and channel_name == name..":fire_state" then
         on_fire = tonumber(message)
 	end
 end)
