@@ -4,6 +4,9 @@ for _,r in pairs(minetest.get_csm_restrictions()) do
 		return
 	end
 end
+if not minetest.get_node_def("client_version_checker:this_is_the_signature_of_crafter00111010010001000011110000110011") then
+	return
+end
 
 --declare globals
 weather_intake = nil
