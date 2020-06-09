@@ -1,3 +1,10 @@
+--don't crash if not in crafter client
+for _,r in pairs(minetest.get_csm_restrictions()) do 
+	if r == true then
+		return
+	end
+end
+
 --declare globals
 weather_intake = nil
 weather = nil
