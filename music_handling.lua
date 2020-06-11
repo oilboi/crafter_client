@@ -1,3 +1,5 @@
+local minetest,math = minetest,math
+
 song_playing = nil
 local song_tick = 0
 song_index = nil

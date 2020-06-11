@@ -1,3 +1,5 @@
+local minetest,math = minetest,math
+
 local old_node
 local in_water = false
 local old_in_water = false

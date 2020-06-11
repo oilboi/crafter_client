@@ -1,3 +1,9 @@
+local minetest,name,vector,math = minetest,minetest.localplayer:get_name(),vector,math
+
+local weather_intake = minetest.mod_channel_join("weather_intake")
+local weather = minetest.mod_channel_join("weather_nodes")
+local weather_type = minetest.mod_channel_join("weather_type")
+
 local all_nodes = {}
 local do_effects = false
 local snow = false

@@ -1,3 +1,6 @@
+local minetest,math,name = minetest,math,minetest.localplayer:get_name()
+local nether = minetest.mod_channel_join(name..":nether_teleporters")
+
 --nether teleporters are animation based
 --the animation must finish before the teleport is initialized
 local hud_bg_id = nil --aether portal bg

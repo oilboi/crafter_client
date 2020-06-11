@@ -1,3 +1,5 @@
+local minetest,name = minetest,minetest.localplayer:get_name()
+local player_movement_state = minetest.mod_channel_join(name..":player_movement_state")
 --double tap running
 
 --set up our initial values

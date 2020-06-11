@@ -1,3 +1,6 @@
+local minetest,name = minetest,minetest.localplayer:get_name()
+local fire_handling_channel = minetest.mod_channel_join(name..":fire_state")
+
 local on_fire = 0
 local fire_id = nil
 local fire_animation_timer = 0

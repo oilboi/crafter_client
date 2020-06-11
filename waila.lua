@@ -1,5 +1,5 @@
+local minetest,vector = minetest,vector
 local hud_item_name = ""
-
 
 local hud_bg = minetest.localplayer:hud_add({
 				hud_elem_type = "image", -- see HUD element types, default "text"
