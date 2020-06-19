@@ -47,13 +47,15 @@ local weather_effects = function(player,defined_type)
 	if defined_type == "rain" then
 	curr_light = minetest.get_node_light({x=pos.x,y=pos.y+1,z=pos.z},0.5)
 	--rain sound effect
-	if curr_light >= 15 then
-		if not rain_sound_handle then
-			rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
+	if curr_light then
+		if curr_light >= 15 then
+			if not rain_sound_handle then
+				rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
+			end
+			minetest.sound_fade(rain_sound_handle, 0.5, 1)
+		elseif curr_light < 15 and rain_sound_handle then
+			minetest.sound_fade(rain_sound_handle, -0.5, 0)
 		end
-		minetest.sound_fade(rain_sound_handle, 0.5, 1)
-	elseif curr_light < 15 and rain_sound_handle then
-		minetest.sound_fade(rain_sound_handle, -0.5, 0)
 	end
 
 	particle_table = {
