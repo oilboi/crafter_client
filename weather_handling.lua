@@ -45,14 +45,14 @@ local weather_effects = function(player,defined_type)
 	end
 
 	if defined_type == "rain" then
-	curr_light = minetest.get_node_light({x=pos.x,y=pos.y+2,z=pos.z},0.5)
+	curr_light = minetest.get_node_light({x=pos.x,y=pos.y+1,z=pos.z},0.5)
 	--rain sound effect
-	if curr_light >= 14 and rain == true then
+	if curr_light >= 15 then
 		if not rain_sound_handle then
 			rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
 		end
 		minetest.sound_fade(rain_sound_handle, 0.5, 1)
-	elseif curr_light < 14 and rain_sound_handle or rain == false and rain_sound_handle then
+	elseif curr_light < 15 and rain_sound_handle then
 		minetest.sound_fade(rain_sound_handle, -0.5, 0)
 	end
 
@@ -158,6 +158,10 @@ local function update_weather()
 				end
 			end
 		end
+	end
+	if not rain and rain_sound_handle then
+		minetest.sound_fade(rain_sound_handle, -0.5, 0)
+		rain_sound_handle = nil
 	end
 	--do again every half second
 	minetest.after(0.5, function()
