@@ -1,4 +1,4 @@
-local minetest,name,vector,math = minetest,minetest.localplayer:get_name(),vector,math
+local minetest,name,vector,math,pairs = minetest,minetest.localplayer:get_name(),vector,math,pairs
 
 local weather_intake = minetest.mod_channel_join("weather_intake")
 local weather = minetest.mod_channel_join("weather_nodes")
@@ -14,35 +14,25 @@ local id_table = {}
 local rain_sound_handle = nil
 
 
---this is rice but it boosts the FPS slightly
+
 local y
-local find_em = minetest.find_nodes_in_area_under_air
 local pos
 local radius = 10
 local particle_table
 local area
 local min
 local max
-local round_it = vector.round
-local new_vec  = vector.new
-local add_it   = vector.add
-local sub_it   = vector.subtract
 local area_index
 local spawn_table
-local get_the_node = minetest.get_node_or_nil
-local get_the_light = minetest.get_node_light
 local lightlevel
-local add_ps = minetest.add_particlespawner
-local l_name = name
--------
+local null
+local curr_light
 local weather_effects = function(player,defined_type)
-	pos = round_it(player:get_pos())
-	particle_table = {}
-	area = new_vec(10,10,10)
-	min = sub_it(pos, area)
-	max = add_it(pos, area)
-	area_index = find_em(min, max, all_nodes)
-	spawn_table = nil -- this has to be terminated before reassignment
+	pos = vector.round(player:get_pos())
+	area = vector.new(10,10,10)
+	min = vector.subtract(pos, area)
+	max = vector.add(pos, area)
+	area_index = minetest.find_nodes_in_area_under_air(min, max, all_nodes)
 	spawn_table = {}
 	--find the highest y value
 	for _,index in pairs(area_index) do
@@ -53,77 +43,87 @@ local weather_effects = function(player,defined_type)
 			spawn_table[index.x][index.z] = index.y
 		end
 	end
+
+	if defined_type == "rain" then
+	curr_light = minetest.get_node_light({x=pos.x,y=pos.y+2,z=pos.z},0.5)
+	--rain sound effect
+	if curr_light >= 14 and rain == true then
+		if not rain_sound_handle then
+			rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
+		end
+		minetest.sound_fade(rain_sound_handle, 0.5, 1)
+	elseif curr_light < 14 and rain_sound_handle or rain == false and rain_sound_handle then
+		minetest.sound_fade(rain_sound_handle, -0.5, 0)
+	end
+
+	particle_table = {
+		amount = 3,
+		time = 0.5,
+		minvel = {x=0, y=-20, z=0},
+		maxvel = {x=0, y=-20, z=0},
+		minacc = {x=0, y=0, z=0},
+		maxacc = {x=0, y=0, z=0},
+		minexptime = 0.5,
+		maxexptime = 0.5,
+		minsize = 4,
+		maxsize = 4,
+		collisiondetection = true,
+		collision_removal = true,
+		object_collision = false,
+		vertical = true,
+		texture = "raindrop.png^[opacity:80",
+	}
+	elseif defined_type == "snow" then
+	particle_table = {
+		amount = 1,
+		time = 0.5,
+		minvel = {x=-0.2, y=-0.2, z=-0.2},
+		maxvel = {x=0.2, y=-0.5, z=0.2},
+		minacc = {x=0, y=0, z=0},
+		maxacc = {x=0, y=0, z=0},
+		minexptime = 1,
+		maxexptime = 1,
+		minsize = 1,
+		maxsize = 1,
+		collisiondetection = true,
+		collision_removal = true,
+		object_collision = false,
+		texture = "snowflake_"..math.random(1,2)..".png",
+	}
+	elseif defined_type == "ichor" then
+	particle_table = {
+		amount = 1,
+		time = 0.5,
+		minvel = {x=-0.2, y=0.2, z=-0.2},
+		maxvel = {x=0.2, y=0.5, z=0.2},
+		minacc = {x=0, y=0, z=0},
+		maxacc = {x=0, y=0, z=0},
+		minexptime = 1,
+		maxexptime = 1,
+		minsize = 1,
+		maxsize = 1,
+		collisiondetection = true,
+		collision_removal = true,
+		object_collision = false,
+		texture = "ichor_"..math.random(1,2)..".png",
+	}
+	end
+
+
 	for x = min.x,max.x do
 		for z = min.z,max.z do
 			y = pos.y - 5
 			if spawn_table[x] and spawn_table[x][z] then
 				y = spawn_table[x][z]
 			end
-			if get_the_node(new_vec(x,y+1,z)) ~= nil then
-				lightlevel = get_the_light(new_vec(x,y+1,z), 0.5)
+			if minetest.get_node_or_nil(vector.new(x,y+1,z)) ~= nil then
+				lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
 				if lightlevel >= 14 or defined_type == "ichor" then
-					if defined_type == "rain" then
-						add_ps({
-							amount = 3,
-							time = 0.5,
-							minpos = new_vec(x-0.5,y,z-0.5),
-							maxpos = new_vec(x+0.5,y+20,z+0.5),
-							minvel = {x=0, y=-20, z=0},
-							maxvel = {x=0, y=-20, z=0},
-							minacc = {x=0, y=0, z=0},
-							maxacc = {x=0, y=0, z=0},
-							minexptime = 0.5,
-							maxexptime = 0.5,
-							minsize = 4,
-							maxsize = 4,
-							collisiondetection = true,
-							collision_removal = true,
-							object_collision = false,
-							vertical = true,
-							texture = "raindrop.png^[opacity:80",
-							playername = l_name,
-						})
-					elseif defined_type == "snow" then
-						add_ps({
-							amount = 1,
-							time = 0.5,
-							minpos = vector.new(x-0.5,y,z-0.5),
-							maxpos = vector.new(x+0.5,y+20,z+0.5),
-							minvel = {x=-0.2, y=-0.2, z=-0.2},
-							maxvel = {x=0.2, y=-0.5, z=0.2},
-							minacc = {x=0, y=0, z=0},
-							maxacc = {x=0, y=0, z=0},
-							minexptime = 1,
-							maxexptime = 1,
-							minsize = 1,
-							maxsize = 1,
-							collisiondetection = true,
-							collision_removal = true,
-							object_collision = false,
-							texture = "snowflake_"..math.random(1,2)..".png",
-							playername = l_name,
-						})
-					elseif defined_type == "ichor" then
-						add_ps({
-							amount = 1,
-							time = 0.5,
-							minpos = vector.new(x-0.5,y,z-0.5),
-							maxpos = vector.new(x+0.5,y+20,z+0.5),
-							minvel = {x=-0.2, y=0.2, z=-0.2},
-							maxvel = {x=0.2, y=0.5, z=0.2},
-							minacc = {x=0, y=0, z=0},
-							maxacc = {x=0, y=0, z=0},
-							minexptime = 1,
-							maxexptime = 1,
-							minsize = 1,
-							maxsize = 1,
-							collisiondetection = true,
-							collision_removal = true,
-							object_collision = false,
-							texture = "ichor_"..math.random(1,2)..".png",
-							playername = player:get_name(),
-						})
-					end
+
+					particle_table.minpos = vector.new(x-0.5,y,z-0.5)
+					particle_table.maxpos = vector.new(x+0.5,y+20,z+0.5)
+
+					null = minetest.add_particlespawner(particle_table)
 				end
 			end
 		end
@@ -185,14 +185,6 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 			rain = false
 			snow = false
 		end
-	end
-	--rain sound effect
-	if not rain_sound_handle and rain == true then
-		rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
-		minetest.sound_fade(rain_sound_handle, 0.5, 0.5)
-	elseif rain_sound_handle and rain == false then
-		minetest.sound_fade(rain_sound_handle, -0.5, 0)
-		rain_sound_handle = nil
 	end
 end)
 
