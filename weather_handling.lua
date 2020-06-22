@@ -55,6 +55,7 @@ local weather_effects = function(player,defined_type)
 			minetest.sound_fade(rain_sound_handle, 0.5, 1)
 		elseif curr_light < 15 and rain_sound_handle then
 			minetest.sound_fade(rain_sound_handle, -0.5, 0)
+			rain_sound_handle = nil
 		end
 	end
 
