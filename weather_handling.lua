@@ -1,4 +1,7 @@
-local minetest,name,vector,math,pairs = minetest,minetest.localplayer:get_name(),vector,math,pairs
+local
+minetest,name,vector,math,pairs
+=
+minetest,minetest.localplayer:get_name(),vector,math,pairs
 
 local weather_intake = minetest.mod_channel_join("weather_intake")
 local weather = minetest.mod_channel_join("weather_nodes")
@@ -27,6 +30,7 @@ local spawn_table
 local lightlevel
 local null
 local curr_light
+local distance = vector.distance
 local weather_effects = function(player,defined_type)
 	pos = vector.round(player:get_pos())
 	area = vector.new(10,10,10)
@@ -62,8 +66,8 @@ local weather_effects = function(player,defined_type)
 	particle_table = {
 		amount = 3,
 		time = 0.5,
-		minvel = {x=0, y=-20, z=0},
-		maxvel = {x=0, y=-20, z=0},
+		minvel = {x=0, y=-30, z=0},
+		maxvel = {x=0, y=-30, z=0},
 		minacc = {x=0, y=0, z=0},
 		maxacc = {x=0, y=0, z=0},
 		minexptime = 0.5,
@@ -115,18 +119,20 @@ local weather_effects = function(player,defined_type)
 
 	for x = min.x,max.x do
 		for z = min.z,max.z do
-			y = pos.y - 5
-			if spawn_table[x] and spawn_table[x][z] then
-				y = spawn_table[x][z]
-			end
-			if minetest.get_node_or_nil(vector.new(x,y+1,z)) ~= nil then
-				lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
-				if lightlevel >= 14 or defined_type == "ichor" then
+			if distance({x=x,y=0,z=z},{x=pos.x,y=0,z=pos.z}) <= 10 then
+				y = pos.y - 5
+				if spawn_table[x] and spawn_table[x][z] then
+					y = spawn_table[x][z]
+				end
+				if minetest.get_node_or_nil(vector.new(x,y+1,z)) ~= nil then
+					lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
+					if lightlevel >= 14 or defined_type == "ichor" then
 
-					particle_table.minpos = vector.new(x-0.5,y,z-0.5)
-					particle_table.maxpos = vector.new(x+0.5,y+20,z+0.5)
+						particle_table.minpos = vector.new(x-0.5,y,z-0.5)
+						particle_table.maxpos = vector.new(x+0.5,y+20,z+0.5)
 
-					null = minetest.add_particlespawner(particle_table)
+						null = minetest.add_particlespawner(particle_table)
+					end
 				end
 			end
 		end
