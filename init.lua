@@ -24,6 +24,7 @@ function initialize_all()
 	dofile(path.."/version_send.lua")
 	dofile(path.."/colored_names/colored_names.lua")
 	dofile(path.."/fire_handling.lua")
+	dofile(path.."/sleeping.lua")
 end
 
 --we must delay initialization until the player exists in the world
@@ -42,18 +43,3 @@ end
 
 --begin initial attempt
 recursive_startup_attempt()
-
---leave mod channels on shutdown
---[[
-minetest.register_on_shutdown(function()
-	weather_intake = nil
-	weather = nil
-	weather_type = nil
-	player_movement_state = nil
-	nether = nil
-	aether = nil
-	name = nil
-	version_channel = nil
-	fire_handling_channel = nil
-end)
-]]--
