@@ -16,6 +16,14 @@ local id_table = {}
 
 local rain_sound_handle = nil
 
+local liquids = {
+	["main:water"] = true,
+	["main:waterflow"] = true,
+	["main:lava"] = true,
+	["main:lavaflow"] = true,
+	["nether:lava"] = true,
+	["nether:lavaflow"] = true,
+}
 
 
 local y
@@ -31,6 +39,7 @@ local lightlevel
 local null
 local curr_light
 local distance = vector.distance
+local current_node 
 local weather_effects = function(player,defined_type)
 	pos = vector.round(player:get_pos())
 	area = vector.new(10,10,10)
@@ -49,15 +58,17 @@ local weather_effects = function(player,defined_type)
 	end
 
 	if defined_type == "rain" then
-	curr_light = minetest.get_node_light({x=pos.x,y=pos.y+1,z=pos.z},0.5)
+	curr_light = minetest.get_node_light(minetest.camera:get_pos(),0.5)
 	--rain sound effect
 	if curr_light then
-		if curr_light >= 15 then
+		current_node = minetest.get_node_or_nil(minetest.camera:get_pos())
+
+		if curr_light >= 15 and current_node and not liquids[current_node.name] then
 			if not rain_sound_handle then
 				rain_sound_handle = minetest.sound_play("rain", {loop=true,gain=0})
 			end
 			minetest.sound_fade(rain_sound_handle, 0.5, 1)
-		elseif curr_light < 15 and rain_sound_handle then
+		elseif rain_sound_handle then
 			minetest.sound_fade(rain_sound_handle, -0.5, 0)
 			rain_sound_handle = nil
 		end
@@ -141,33 +152,42 @@ end
 
 
 
+
 --client runs through spawning weather particles
 local player_pos
+local current_node
 local function update_weather()
 	player_pos = minetest.localplayer:get_pos()
 	if do_effects then
 		if snow or rain then
-			--do normal weather
-			if player_pos.y > -10033 then
-				if snow == true then
-					weather_effects(minetest.localplayer, "snow")
-				elseif rain == true then
-					weather_effects(minetest.localplayer, "rain")
+			current_node = minetest.get_node_or_nil(minetest.camera:get_pos())
+			if current_node and not liquids[current_node.name] then
+				--do normal weather
+				if player_pos.y > -10033 then
+					if snow == true then
+						weather_effects(minetest.localplayer, "snow")
+					elseif rain == true then
+						weather_effects(minetest.localplayer, "rain")
+					end
+				--rain blood upwards in the nether
+				else
+					if snow == true or rain == true then
+						weather_effects(minetest.localplayer, "ichor")
+					end
+				
+					--stop the rain sound effect
+					if rain_sound_handle then
+						minetest.sound_fade(rain_sound_handle, -0.5, 0)
+						rain_sound_handle = nil
+					end
 				end
-			--rain blood upwards in the nether
-			else
-				if snow == true or rain == true then
-					weather_effects(minetest.localplayer, "ichor")
-				end
-			
-				--stop the rain sound effect
-				if rain_sound_handle then
-					minetest.sound_fade(rain_sound_handle, -0.5, 0)
-					rain_sound_handle = nil
-				end
+			elseif rain_sound_handle then
+				minetest.sound_fade(rain_sound_handle, -0.5, 0)
+				rain_sound_handle = nil
 			end
 		end
 	end
+
 	if not rain and rain_sound_handle then
 		minetest.sound_fade(rain_sound_handle, -0.5, 0)
 		rain_sound_handle = nil
