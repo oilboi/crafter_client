@@ -203,6 +203,10 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	--to spawn weather columns on
 	if sender == "" and channel_name == "weather_nodes" then
 		all_nodes = minetest.deserialize(message)
+		nodes = {}
+		for _,key in pairs(all_nodes) do
+			nodes[key] = true
+		end
 		do_effects = true
 		weather:leave() --leave the channel
 	end

@@ -8,6 +8,7 @@ if not minetest.get_node_def("client_version_checker:this_is_the_signature_of_cr
 	return
 end
 
+nodes = nil
 function initialize_all()
 	--declare globals for now
 

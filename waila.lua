@@ -1,6 +1,6 @@
 local minetest,vector = minetest,vector
 local hud_item_name = ""
-
+local all_nodes
 local hud_bg = minetest.localplayer:hud_add({
 				hud_elem_type = "image", -- see HUD element types, default "text"
 				position = {x=0.5, y=0},
@@ -51,47 +51,57 @@ local waih_timer = 0
 local old_item = ""
 
 local function update()
-	--waila
-	if minetest.camera then
-		local pos = minetest.camera:get_pos()
-		local pos2 = vector.add(pos,vector.multiply(minetest.camera:get_look_dir(), 4))
-		local ray = minetest.raycast(pos, pos2, false, false)
-		
-		local pointed_thing = ray:next()
-		if pointed_thing and pointed_thing.under then
-			local node = minetest.get_node_or_nil(pointed_thing.under).name
-			if hud_item_name ~= node then
-				local def = minetest.get_item_def(node)
-				minetest.localplayer:hud_change(hud_name, "text", def.description)
-				minetest.localplayer:hud_change(hud_node, "text", node)
-				minetest.localplayer:hud_change(hud_bg,   "text", "waila.png")
-				hud_item_name = node
-			end
-		else
-			--make hud invisible
-			minetest.localplayer:hud_change(hud_name, "text", "")
-			minetest.localplayer:hud_change(hud_node, "text", "")
-			minetest.localplayer:hud_change(hud_bg,   "text", "")
-			hud_item_name = ""
-		end
-	end
 
-	
-	--waih
-	local item = minetest.localplayer:get_wielded_item():get_name()
-	if waih_timer > 0 then
-		waih_timer = waih_timer - 0.01
-		if waih_timer <= 0 then
-			waih_timer = 0
-			minetest.localplayer:hud_change(waih_name, "text", "")
+	if all_nodes then
+		--waila
+		if minetest.camera then
+			local pos = minetest.camera:get_pos()
+			local pos2 = vector.add(pos,vector.multiply(minetest.camera:get_look_dir(), 4))
+			local ray = minetest.raycast(pos, pos2, false, false)
+			
+			local pointed_thing = ray:next()
+			if pointed_thing and pointed_thing.under and all_nodes[minetest.get_node_or_nil(pointed_thing.under).name] then
+				local node = minetest.get_node_or_nil(pointed_thing.under).name
+				if hud_item_name ~= node then
+					local def = minetest.get_item_def(node)
+					minetest.localplayer:hud_change(hud_name, "text", def.description)
+					minetest.localplayer:hud_change(hud_node, "text", node)
+					minetest.localplayer:hud_change(hud_bg,   "text", "waila.png")
+					hud_item_name = node
+				end
+			else
+				--make hud invisible
+				minetest.localplayer:hud_change(hud_name, "text", "")
+				minetest.localplayer:hud_change(hud_node, "text", "")
+				minetest.localplayer:hud_change(hud_bg,   "text", "")
+				hud_item_name = ""
+			end
 		end
+
+		
+		--waih
+		local item = minetest.localplayer:get_wielded_item():get_name()
+		if waih_timer > 0 then
+			waih_timer = waih_timer - 0.01
+			if waih_timer <= 0 then
+				waih_timer = 0
+				minetest.localplayer:hud_change(waih_name, "text", "")
+			end
+		end
+		if item ~= old_item then
+			waih_timer = 1
+			local waih_text
+			if all_nodes[item] then
+				waih_text = minetest.get_item_def(item).description or item
+			else
+				waih_text = "Unknown"
+			end
+			minetest.localplayer:hud_change(waih_name, "text", waih_text)
+		end
+		old_item = item
+	elseif nodes then
+		all_nodes = table.copy(nodes)
 	end
-	if item ~= old_item then
-		waih_timer = 1
-		local waih_text = minetest.get_item_def(item).description or item
-		minetest.localplayer:hud_change(waih_name, "text", waih_text)
-	end
-	old_item = item
 
 
 	minetest.after(0.01, function()
